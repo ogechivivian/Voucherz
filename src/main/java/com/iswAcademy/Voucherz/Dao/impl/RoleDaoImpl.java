@@ -35,7 +35,7 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     @Override
-    public List<Role> ReadAll() {
+    public List<Role> findAll() {
         return null;
     }
 

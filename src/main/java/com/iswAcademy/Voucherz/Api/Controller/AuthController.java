@@ -1,9 +1,6 @@
 package com.iswAcademy.Voucherz.Api.Controller;
 
-import com.iswAcademy.Voucherz.Api.Controller.Model.JwtAuthenticationResponse;
-import com.iswAcademy.Voucherz.Api.Controller.Model.LoginInRequest;
-import com.iswAcademy.Voucherz.Api.Controller.Model.Response;
-import com.iswAcademy.Voucherz.Api.Controller.Model.UserRegistrationRequest;
+import com.iswAcademy.Voucherz.Api.Controller.Model.*;
 import com.iswAcademy.Voucherz.Util.JwtTokenProvider;
 import com.iswAcademy.Voucherz.Model.RoleName;
 import com.iswAcademy.Voucherz.Model.User;
@@ -17,11 +14,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import java.util.logging.Logger;
 
 @RestController
@@ -81,25 +80,8 @@ public class AuthController {
         user.setPhoneNumber(request.getPhoneNumber());
         user.setCompanySize(request.getCompanySize());
 
-//        Role userRole = new Role();
-//
-//        if (roleService.findRole(RoleName.ROLE_USER) == null) {
-//            throw new AppException(" User Role not set");
-//        }
-//        System.out.println("successful");
-//        ArrayList<Role> roles = new ArrayList<>();
-//        Role roleUser = new Role();
-//        roleUser.setName(RoleName.ROLE_USER);
-
-//        Role roleAdmin = new Role();
-//        roleAdmin.setName(RoleName.ROLE_ADMIN);
-
-//        roles.add(roleUser);
-//        roles.add(roleAdmin);
-
         user.setRole(RoleName.ROLE_USER.toString());
         User  result= userService.createUser(user);
-
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/auth/{email}")
@@ -110,11 +92,36 @@ public class AuthController {
 
     }
 
-    @GetMapping("/notsecured")
-    public Response testing (){
-        System.out.println("hello world");
-        return new Response("200","Successful");
+    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    @ResponseStatus(HttpStatus.OK)
+    public Response updateUser(@PathVariable( "id" ) long id, @RequestBody @Validated final UpdateUserRequest request) {
+        User user = userService.findById(id);
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setCompanySize(request.getCompanySize());
+        userService.updateUser(id,user);
+        return  new Response ("200", "Updated");
+
     }
+
+    @RequestMapping(value = "/{email}", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.FOUND)
+    public User findUser(@PathVariable String email){
+       User user =  userService.findUser(email);
+       return user;
+    }
+
+    @RequestMapping(value ="/users", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public List<User> findAllUser(){
+        List<User> userList = userService.findAll();
+        return userList;
+    }
+
+
 
 
 }

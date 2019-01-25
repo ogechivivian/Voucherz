@@ -11,7 +11,7 @@ public interface BaseDao<T> {
 
     public T findById(long id);
 
-    public List<T> ReadAll();
+    public List<T> findAll();
 
     public boolean delete(T model);
 }

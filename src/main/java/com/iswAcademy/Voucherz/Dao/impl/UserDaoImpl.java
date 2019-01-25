@@ -30,8 +30,9 @@ public class UserDaoImpl extends AbstractBaseDao<User> implements UserDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         create = new SimpleJdbcCall(dataSource).withProcedureName("uspCreateUser2").withReturnValue();
         update = new SimpleJdbcCall(dataSource).withProcedureName("uspCreateUser2").withReturnValue();
+        findById = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUserbyid").returningResultSet(SINGLE_RESULT,new BeanPropertyRowMapper<>(User.class));
         find = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUser").returningResultSet(SINGLE_RESULT,new BeanPropertyRowMapper<>(User.class));
-        findAll = new SimpleJdbcCall(dataSource).withProcedureName("uspFindAllUser").returningResultSet(RESULT_COUNT, new RowCountMapper()).returningResultSet(MULTIPLE_RESULT, new BeanPropertyRowMapper<>(User.class));
+        findAll = new SimpleJdbcCall(dataSource).withProcedureName("uspFindAllUser").returningResultSet(MULTIPLE_RESULT, new BeanPropertyRowMapper<>(User.class));
 
 
     }
@@ -61,7 +62,28 @@ public class UserDaoImpl extends AbstractBaseDao<User> implements UserDao {
 
     @Override
     public User findById(long id) {
-        return null;
+        SqlParameterSource in = new MapSqlParameterSource().addValue("id", id);
+        Map<String,Object> m = findById.execute(in);
+        List<User>list = (List<User>) m.get(SINGLE_RESULT);
+        if(list==null || list.isEmpty()){
+            return null;
+        }
+        return list.get(0);
+
     }
+
+    @Override
+    public List<User> findAll() {
+        Map<String,Object> m = findAll.execute();
+        List<User>list = (List<User>) m.get(MULTIPLE_RESULT);
+       if(list==null || list.isEmpty()){ return null;
+      }
+        return list;
+   }
+
+
+
+
+
 }
 

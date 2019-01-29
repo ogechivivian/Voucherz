@@ -1,11 +1,13 @@
 package com.iswAcademy.Voucherz.Api.Controller;
 
 import com.iswAcademy.Voucherz.Api.Controller.Model.*;
+import com.iswAcademy.Voucherz.Producer.Producer;
 import com.iswAcademy.Voucherz.Util.JwtTokenProvider;
 import com.iswAcademy.Voucherz.Model.RoleName;
 import com.iswAcademy.Voucherz.Model.User;
 import com.iswAcademy.Voucherz.Service.RoleService;
 import com.iswAcademy.Voucherz.Service.UserService;
+import com.netflix.discovery.converters.Auto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +49,9 @@ public class AuthController {
     @Autowired
     JwtTokenProvider tokenProvider;
 
+    @Autowired
+    Producer producer;
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginInRequest loginInRequest){
         Authentication authentication = authenticationManager.authenticate(
@@ -64,7 +69,7 @@ public class AuthController {
     }
 
 
-    @PostMapping("/signup")
+    @PostMapping("/signup" )
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationRequest request){
         User user = new User();
 
@@ -77,10 +82,11 @@ public class AuthController {
         user.setLastName(request.getLastName());
         user.setPassword( passwordEncoder.encode(request.getPassword()));
         user.setEmail(request.getEmail());
-        user.setPhoneNumber(request.getPhoneNumber());
+
         user.setCompanySize(request.getCompanySize());
 
         user.setRole(RoleName.ROLE_USER.toString());
+        producer.produce(user);
         User  result= userService.createUser(user);
 
         URI location = ServletUriComponentsBuilder
@@ -100,8 +106,9 @@ public class AuthController {
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
-        user.setPhoneNumber(request.getPhoneNumber());
+
         user.setCompanySize(request.getCompanySize());
+//        producer.produce(user);
         userService.updateUser(id,user);
         return  new Response ("200", "Updated");
 

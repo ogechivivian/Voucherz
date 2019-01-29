@@ -32,7 +32,7 @@ public class UserController {
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
-        user.setPhoneNumber(request.getPhoneNumber());
+
         user.setCompanySize(request.getCompanySize());
         userService.createUser(user);
         return new Response("200","Successful");
@@ -47,7 +47,6 @@ public class UserController {
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
-        user.setPhoneNumber(request.getPhoneNumber());
         user.setCompanySize(request.getCompanySize());
         userService.updateUser(id,user);
         return  new Response ("200", "Updated");

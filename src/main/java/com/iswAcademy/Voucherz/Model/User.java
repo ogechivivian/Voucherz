@@ -1,6 +1,12 @@
 package com.iswAcademy.Voucherz.Model;
 
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class,property="@id", scope = User.class)
 public class User extends BaseEntity{
 
     private  String FirstName;
@@ -11,12 +17,21 @@ public class User extends BaseEntity{
 
     private String Password;
 
-    private String PhoneNumber;
-
-
     private int CompanySize;
 
     private String Role;
+
+    public User() {
+    }
+
+    public User(String firstName, String lastName, String email, String password, int companySize, String role) {
+        FirstName = firstName;
+        LastName = lastName;
+        Email = email;
+        Password = password;
+        CompanySize = companySize;
+        Role = role;
+    }
 
     public String getRole() {
         return Role;
@@ -50,13 +65,6 @@ public class User extends BaseEntity{
         Email = email;
     }
 
-    public String getPhoneNumber() {
-        return PhoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        PhoneNumber = phoneNumber;
-    }
 
     public String getPassword() {
         return Password;
@@ -72,5 +80,22 @@ public class User extends BaseEntity{
 
     public void setCompanySize(int companySize) {
         CompanySize = companySize;
+    }
+
+    @Override
+    public String toString() {
+        JSONObject jsonInfo = new JSONObject();
+
+        try{
+            jsonInfo.put("FirstName", this.FirstName);
+            jsonInfo.put("LastName", this.LastName);
+            jsonInfo.put("Email", this.Email);
+            jsonInfo.put("Password", this.Password);
+            jsonInfo.put("CompanySame", this.CompanySize);
+            jsonInfo.put("Role", this.Role);
+        }catch (JSONException el){}
+        return jsonInfo.toString();
+
+
     }
 }

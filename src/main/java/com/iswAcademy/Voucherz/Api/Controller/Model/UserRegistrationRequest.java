@@ -17,9 +17,6 @@ public class UserRegistrationRequest extends LoginInRequest {
     @NotBlank(message = "required")
     private String LastName;
 
-    @Length(min=3, max = 20)
-    @NotBlank(message="required")
-    private String PhoneNumber;
 
     private int CompanySize;
 
@@ -50,14 +47,6 @@ public class UserRegistrationRequest extends LoginInRequest {
         LastName = lastName;
     }
 
-
-    public String getPhoneNumber() {
-        return PhoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        PhoneNumber = phoneNumber;
-    }
 
     public int getCompanySize() {
         return CompanySize;

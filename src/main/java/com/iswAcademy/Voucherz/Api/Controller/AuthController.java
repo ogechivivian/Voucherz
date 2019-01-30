@@ -86,6 +86,7 @@ public class AuthController {
         user.setCompanySize(request.getCompanySize());
 
         user.setRole(RoleName.ROLE_USER.toString());
+        logger.info("user is being produced"+user.toString());
         producer.produce(user);
         User  result= userService.createUser(user);
 
@@ -127,6 +128,19 @@ public class AuthController {
         List<User> userList = userService.findAll();
         return userList;
     }
+
+
+//    @PostMapping("/signout")
+//    @ResponseBody
+//    public ResponseEntity<AuthResponse> logout(@RequestHeader(value="Authorization") String token){
+//        HttpHeaders headers = new HttpHeaders();
+//        if(loginService.logout(token)){
+//            headers.remove("Authorisation");
+//            return new ResponseEntity<AuthResponse>(new AuthResponse("logged out"), headers,HttpStatus.CREATED);
+//
+//        }
+//        return new ResponseEntity<AuthResponse>(new AuthResponse("Logout Failed"),headers, HttpStatus.NOT_MODIFIED);
+//    }
 
 
 

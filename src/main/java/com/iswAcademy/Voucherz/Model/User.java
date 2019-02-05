@@ -1,13 +1,16 @@
 package com.iswAcademy.Voucherz.Model;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class,property="@id", scope = User.class)
-public class User extends BaseEntity{
+import java.io.Serializable;
+
+//@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class,property="@id", scope = User.class)
+public class User extends BaseEntity implements Serializable {
 
     private  String FirstName;
 
@@ -24,7 +27,7 @@ public class User extends BaseEntity{
     public User() {
     }
 
-    public User(String firstName, String lastName, String email, String password, int companySize, String role) {
+    public User(@JsonProperty("firstName")String firstName, @JsonProperty("lastName")String lastName, @JsonProperty("email")String email, @JsonProperty("password")String password, @JsonProperty("companySize")int companySize, @JsonProperty("role")String role) {
         FirstName = firstName;
         LastName = lastName;
         Email = email;
@@ -84,18 +87,31 @@ public class User extends BaseEntity{
 
     @Override
     public String toString() {
-        JSONObject jsonInfo = new JSONObject();
-
-        try{
-            jsonInfo.put("FirstName", this.FirstName);
-            jsonInfo.put("LastName", this.LastName);
-            jsonInfo.put("Email", this.Email);
-            jsonInfo.put("Password", this.Password);
-            jsonInfo.put("CompanySame", this.CompanySize);
-            jsonInfo.put("Role", this.Role);
-        }catch (JSONException el){}
-        return jsonInfo.toString();
-
-
+        return "User{" +
+                "FirstName='" + FirstName + '\'' +
+                ", LastName='" + LastName + '\'' +
+                ", Email='" + Email + '\'' +
+                ", Password='" + Password + '\'' +
+                ", CompanySize=" + CompanySize +
+                ", Role='" + Role + '\'' +
+                '}';
     }
+
+
+    //    @Override
+//    public String toString() {
+//        JSONObject jsonInfo = new JSONObject();
+//
+//        try{
+//            jsonInfo.put("FirstName", this.FirstName);
+//            jsonInfo.put("LastName", this.LastName);
+//            jsonInfo.put("Email", this.Email);
+//            jsonInfo.put("Password", this.Password);
+//            jsonInfo.put("CompanySame", this.CompanySize);
+//            jsonInfo.put("Role", this.Role);
+//        }catch (JSONException el){}
+//        return jsonInfo.toString();
+//
+//
+//    }
 }

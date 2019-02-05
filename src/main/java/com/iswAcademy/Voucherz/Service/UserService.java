@@ -13,5 +13,6 @@ public interface UserService {
     public User findUser(String Email);
     public List<User> findAll();
     public User findById(long id);
+    boolean logout(String token);
 
 }

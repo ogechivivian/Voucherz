@@ -1,13 +1,18 @@
 package com.iswAcademy.Voucherz.Api.Controller;
 
 import com.iswAcademy.Voucherz.Api.Controller.Model.*;
-import com.iswAcademy.Voucherz.Producer.Producer;
+import com.iswAcademy.Voucherz.Producer.AuditProducer;
+//import com.iswAcademy.Voucherz.Producer.Producer;
 import com.iswAcademy.Voucherz.Util.JwtTokenProvider;
 import com.iswAcademy.Voucherz.Model.RoleName;
 import com.iswAcademy.Voucherz.Model.User;
 import com.iswAcademy.Voucherz.Service.RoleService;
 import com.iswAcademy.Voucherz.Service.UserService;
-import com.netflix.discovery.converters.Auto;
+import com.iswAcademy.Voucherz.event.AuditMessage;
+//import com.iswAcademy.Voucherz.event.Event;
+//import com.iswAcademy.Voucherz.event.UserCreatedEvent;
+//import com.iswAcademy.Voucherz.event.UserLoginEvent;
+//import com.iswAcademy.Voucherz.event.UserUpdateEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +27,12 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping("api/auth")
-
+@RequestMapping("/user")
 public class AuthController {
 
     protected Logger logger = Logger.getLogger(AuthController.class.getName());
@@ -49,8 +54,10 @@ public class AuthController {
     @Autowired
     JwtTokenProvider tokenProvider;
 
+//    @Autowired
+//    Producer producer;
     @Autowired
-    Producer producer;
+    AuditProducer auditProducer;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginInRequest loginInRequest){
@@ -60,7 +67,8 @@ public class AuthController {
                         loginInRequest.getPassword()
                 )
         );
-
+       AuditMessage event = new AuditMessage("Login",loginInRequest.getEmail(),new Date());
+       auditProducer.sendAudit(event);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = tokenProvider.generateToken(authentication);
@@ -70,12 +78,11 @@ public class AuthController {
 
 
     @PostMapping("/signup" )
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationRequest request){
+    public ResponseEntity<Response> registerUser(@Valid @RequestBody UserRegistrationRequest request){
         User user = new User();
 
         if(userService.findUser(user.getEmail()) != null){
-            return new ResponseEntity(new Response("400", "Email Already in use"),
-                    HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<Response>(new Response("400","Email Already Exist"),HttpStatus.BAD_REQUEST);
         }
 //Creating User's account
         user.setFirstName(request.getFirstName());
@@ -86,16 +93,18 @@ public class AuthController {
         user.setCompanySize(request.getCompanySize());
 
         user.setRole(RoleName.ROLE_USER.toString());
-        logger.info("user is being produced"+user.toString());
-        producer.produce(user);
+//        UserCreatedEvent event = new UserCreatedEvent(user, new Date());
+        AuditMessage event = new AuditMessage("Registered ", user.getEmail(), new Date());
+        auditProducer.sendAudit(event);
         User  result= userService.createUser(user);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentContextPath().path("/api/auth/{email}")
-                .buildAndExpand(result.getEmail()).toUri();
+//        URI location = ServletUriComponentsBuilder
+//                .fromCurrentContextPath().path("/auth/{email}")
+//                .buildAndExpand(result.getEmail()).toUri();
         logger.info(String.format("Signup.registerUser(%s)", user));
+        return new ResponseEntity<Response>(new Response("201", "created"), HttpStatus.CREATED);
 
-        return ResponseEntity.created(location).body(new Response("201", "created"));
+//        return ResponseEntity.created(location).body(new Response("201", "created"));
 
     }
 
@@ -107,9 +116,10 @@ public class AuthController {
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
-
         user.setCompanySize(request.getCompanySize());
-//        producer.produce(user);
+//        UserUpdateEvent updateEvent = new UserUpdateEvent();
+//      producer.updatePublisher(updateEvent);
+      logger.info(String.format("this user updated registration details", user.getEmail()));
         userService.updateUser(id,user);
         return  new Response ("200", "Updated");
 
@@ -128,19 +138,6 @@ public class AuthController {
         List<User> userList = userService.findAll();
         return userList;
     }
-
-
-//    @PostMapping("/signout")
-//    @ResponseBody
-//    public ResponseEntity<AuthResponse> logout(@RequestHeader(value="Authorization") String token){
-//        HttpHeaders headers = new HttpHeaders();
-//        if(loginService.logout(token)){
-//            headers.remove("Authorisation");
-//            return new ResponseEntity<AuthResponse>(new AuthResponse("logged out"), headers,HttpStatus.CREATED);
-//
-//        }
-//        return new ResponseEntity<AuthResponse>(new AuthResponse("Logout Failed"),headers, HttpStatus.NOT_MODIFIED);
-//    }
 
 
 

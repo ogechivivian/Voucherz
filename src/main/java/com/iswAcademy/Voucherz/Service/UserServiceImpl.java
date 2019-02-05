@@ -48,5 +48,10 @@ public class UserServiceImpl implements UserService{
        return userDao.findById(id);
     }
 
+    @Override
+    public boolean logout(String token) {
+        return false;
+    }
+
 
 }

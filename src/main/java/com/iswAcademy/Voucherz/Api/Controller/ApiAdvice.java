@@ -36,7 +36,7 @@ public class ApiAdvice {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public Response handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        Response response = new Response("400", e.getLocalizedMessage(), null);
+        Response response = new Response("400", e.getLocalizedMessage());
         if (e.getCause() != null) {
             String message = e.getCause().getMessage();
             if (e.getCause() instanceof JsonMappingException) {
@@ -60,7 +60,7 @@ public class ApiAdvice {
                     message = temp + " [line: " + jpe.getLocation().getLineNr() + ", column: " + jpe.getLocation().getColumnNr() + "]";
                 }
             }
-            response = new Response("400", message, null);
+            response = new Response("400", message);
 
         }
         return response;

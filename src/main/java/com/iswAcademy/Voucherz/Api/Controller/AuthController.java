@@ -2,18 +2,14 @@ package com.iswAcademy.Voucherz.Api.Controller;
 
 import com.iswAcademy.Voucherz.Api.Controller.Model.*;
 import com.iswAcademy.Voucherz.Producer.AuditProducer;
-//import com.iswAcademy.Voucherz.Producer.Producer;
 import com.iswAcademy.Voucherz.Util.JwtTokenProvider;
 import com.iswAcademy.Voucherz.Model.RoleName;
 import com.iswAcademy.Voucherz.Model.User;
 import com.iswAcademy.Voucherz.Service.RoleService;
 import com.iswAcademy.Voucherz.Service.UserService;
 import com.iswAcademy.Voucherz.event.AuditMessage;
-//import com.iswAcademy.Voucherz.event.Event;
-//import com.iswAcademy.Voucherz.event.UserCreatedEvent;
-//import com.iswAcademy.Voucherz.event.UserLoginEvent;
-//import com.iswAcademy.Voucherz.event.UserUpdateEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,10 +19,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 
 import javax.validation.Valid;
-import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -59,6 +54,7 @@ public class AuthController {
     @Autowired
     AuditProducer auditProducer;
 
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginInRequest loginInRequest){
         Authentication authentication = authenticationManager.authenticate(
@@ -76,7 +72,6 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
-
     @PostMapping("/signup" )
     public ResponseEntity<Response> registerUser(@Valid @RequestBody UserRegistrationRequest request){
         User user = new User();
@@ -89,11 +84,8 @@ public class AuthController {
         user.setLastName(request.getLastName());
         user.setPassword( passwordEncoder.encode(request.getPassword()));
         user.setEmail(request.getEmail());
-
         user.setCompanySize(request.getCompanySize());
-
         user.setRole(RoleName.ROLE_USER.toString());
-//        UserCreatedEvent event = new UserCreatedEvent(user, new Date());
         AuditMessage event = new AuditMessage("Registered ", user.getEmail(), new Date());
         auditProducer.sendAudit(event);
         User  result= userService.createUser(user);
@@ -117,8 +109,8 @@ public class AuthController {
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
         user.setCompanySize(request.getCompanySize());
-//        UserUpdateEvent updateEvent = new UserUpdateEvent();
-//      producer.updatePublisher(updateEvent);
+        AuditMessage event = new AuditMessage("Updated", user.getEmail(), new Date());
+        auditProducer.sendAudit(event);
       logger.info(String.format("this user updated registration details", user.getEmail()));
         userService.updateUser(id,user);
         return  new Response ("200", "Updated");
@@ -137,6 +129,19 @@ public class AuthController {
     public List<User> findAllUser(){
         List<User> userList = userService.findAll();
         return userList;
+    }
+
+    @PostMapping("/signout")
+    @ResponseBody
+    public ResponseEntity<Response> signout(@RequestHeader(value="Authorization") String token){
+        HttpHeaders headers = new HttpHeaders();
+        if(userService.logout(token)){
+            headers.remove("Authorisation");
+//            AuditMessage event = new AuditMessage("Logout")
+            return new ResponseEntity<Response>(new Response("","logged out"), headers,HttpStatus.CREATED);
+
+        }
+        return new ResponseEntity<Response>(new Response( "","Logout Failed"),headers, HttpStatus.NOT_MODIFIED);
     }
 
 

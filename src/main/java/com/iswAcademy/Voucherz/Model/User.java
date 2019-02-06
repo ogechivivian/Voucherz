@@ -24,16 +24,28 @@ public class User extends BaseEntity implements Serializable {
 
     private String Role;
 
+    private  String resetToken;
+
     public User() {
     }
 
-    public User(@JsonProperty("firstName")String firstName, @JsonProperty("lastName")String lastName, @JsonProperty("email")String email, @JsonProperty("password")String password, @JsonProperty("companySize")int companySize, @JsonProperty("role")String role) {
+
+    public User(@JsonProperty("firstName")String firstName, @JsonProperty("lastName")String lastName, @JsonProperty("email")String email, @JsonProperty("password")String password, @JsonProperty("companySize")int companySize, @JsonProperty("role")String role, @JsonProperty("resetToken")String resetToken) {
         FirstName = firstName;
         LastName = lastName;
         Email = email;
         Password = password;
         CompanySize = companySize;
         Role = role;
+        this.resetToken = resetToken;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
     }
 
     public String getRole() {

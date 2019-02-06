@@ -19,7 +19,7 @@ import java.util.TimeZone;
 
 
 @SpringBootApplication
-@EnableDiscoveryClient
+//@EnableDiscoveryClient
 public class VoucherzApplication implements CommandLineRunner {
 
     public static final String EXCHANGE_NAME = "regExchange";

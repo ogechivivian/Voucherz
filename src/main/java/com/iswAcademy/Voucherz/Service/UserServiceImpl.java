@@ -53,5 +53,10 @@ public class UserServiceImpl implements UserService{
         return false;
     }
 
+    @Override
+    public User findUserbytoken(String resetToken) {
+       return userDao.findByResetToken(resetToken);
+    }
+
 
 }

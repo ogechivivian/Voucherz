@@ -14,5 +14,7 @@ public interface UserService {
     public List<User> findAll();
     public User findById(long id);
     boolean logout(String token);
+    public User findUserbytoken(String resetToken);
+
 
 }

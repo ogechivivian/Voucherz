@@ -18,8 +18,9 @@ import javax.annotation.PostConstruct;
 import java.util.TimeZone;
 
 
+
+@EnableDiscoveryClient
 @SpringBootApplication
-//@EnableDiscoveryClient
 public class VoucherzApplication implements CommandLineRunner {
 
     public static final String EXCHANGE_NAME = "regExchange";

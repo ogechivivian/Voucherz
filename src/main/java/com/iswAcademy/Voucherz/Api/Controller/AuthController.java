@@ -65,6 +65,7 @@ public class AuthController {
         );
        AuditMessage event = new AuditMessage("Login",loginInRequest.getEmail(),new Date());
        auditProducer.sendAudit(event);
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = tokenProvider.generateToken(authentication);

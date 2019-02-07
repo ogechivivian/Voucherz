@@ -33,11 +33,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwt = getJwtFromRequest(request);
 
             if(StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)){
+
                 String  userId = tokenProvider.getUserIdFromJWT(jwt);
 
+                // getting useridbfrom the token
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(userId);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                logger.info("<<<<<<<<User credentials>>>>> "+userDetails.toString());
+                // a container to keep access token for user controlQ
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userId, null, null);
+                //userDetails.getAuthorities()
+//                authentication.setDetails(userDetails);
+
+                //this is used to  hold all the content for a particular request ..container that holds the token
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             }

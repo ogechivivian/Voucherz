@@ -10,6 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 
+import javax.annotation.PostConstruct;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -17,12 +19,16 @@ public class JwtTokenProvider {
 
     private final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
-    @Value("${app.jwtSecret}")
-    private String jwtSecret;
+//    @Value("${app.jwtSecret}")
+    private String jwtSecret="JWTSuperSecretKey";
 
-    @Value("${app.jwtExpirationInMs}")
-    private int jwtExpirationInMs;
+//    @Value("${app.jwtExpirationInMs}")
+    private long jwtExpirationInMs = 1000000000;
 
+    @PostConstruct
+    protected void init(){
+        jwtSecret = Base64.getEncoder().encodeToString(jwtSecret.getBytes());
+    }
 
     public String generateToken(Authentication authentication){
         //downcasted
@@ -39,14 +45,15 @@ public class JwtTokenProvider {
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512,jwtSecret)
+                .signWith(SignatureAlgorithm.HS256,Base64.getEncoder().encodeToString(jwtSecret.getBytes()))
                 .compact();
 
     }
 
+    // decrypting the token
     public String getUserIdFromJWT(String token){
         Claims claims = Jwts.parser()
-                .setSigningKey(jwtSecret)
+                .setSigningKey(Base64.getEncoder().encodeToString(jwtSecret.getBytes()))
                 .parseClaimsJws(token)
                 .getBody();
 
@@ -55,7 +62,7 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String authToken){
         try{
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+            Jwts.parser().setSigningKey(Base64.getEncoder().encodeToString(jwtSecret.getBytes())).parseClaimsJws(authToken);
             return true;
         }catch(SignatureException ex){
             logger.error("Invalid JWT signature");

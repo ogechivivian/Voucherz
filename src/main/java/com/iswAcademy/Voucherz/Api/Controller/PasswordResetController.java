@@ -73,6 +73,12 @@ public class PasswordResetController {
         userService.createUser(resetUser);
         return("login");
     }
-
+    @RequestMapping("/rest/hello/server")
+    public class Helloresource{
+        @GetMapping
+        public String hello(){
+            return "Hello World";
+        }
+    }
 
 }
